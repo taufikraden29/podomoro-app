@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from "react";
+import Modal from "./Modal";
 
 const Timer = () => {
-  const [time, setTime] = useState(25 * 60); // Default 25 menit (dalam detik)
+  const [time, setTime] = useState(25 * 60); // Default 25 menit
   const [isRunning, setIsRunning] = useState(false);
   const [isWorkSession, setIsWorkSession] = useState(true); // Apakah sesi kerja?
-  const [workDuration, setWorkDuration] = useState(25); // Default 25 menit
-  const [breakDuration, setBreakDuration] = useState(5); // Default 5 menit
-
-  // Meminta izin notifikasi saat aplikasi dimuat
-  useEffect(() => {
-    if (Notification.permission === "default") {
-      Notification.requestPermission();
-    }
-  }, []);
+  const [workDuration, setWorkDuration] = useState(25); // Durasi kerja
+  const [breakDuration, setBreakDuration] = useState(5); // Durasi istirahat
+  const [isModalOpen, setIsModalOpen] = useState(false); // State modal
+  const [modalMessage, setModalMessage] = useState(""); // Pesan modal
 
   // Timer logic
   useEffect(() => {
@@ -33,31 +29,16 @@ const Timer = () => {
     return () => clearInterval(timer);
   }, [isRunning, isWorkSession, workDuration, breakDuration]);
 
-  // Ketika sesi selesai, beralih sesi, dan tampilkan notifikasi
+  // Ketika sesi selesai, beralih sesi, dan tampilkan modal
   const handleSessionEnd = () => {
     const nextSession = !isWorkSession;
     setIsWorkSession(nextSession);
-    showNotification(nextSession);
-  };
 
-  // Fungsi untuk menampilkan notifikasi
-  const showNotification = (nextSession) => {
-    if (Notification.permission === "granted") {
-      const notification = new Notification(
-        nextSession ? "Time to Work!" : "Take a Break!",
-        {
-          body: nextSession
-            ? "Your break is over. Time to get back to work!"
-            : "Great work! Time for a short break.",
-          icon: "/pomodoro-icon.png", // Tambahkan ikon jika ada
-        }
-      );
-
-      // Opsional: Tambahkan aksi klik pada notifikasi
-      notification.onclick = () => {
-        window.focus();
-      };
-    }
+    const message = nextSession
+      ? "Time to Work! Your break is over."
+      : "Great work! Time for a short break.";
+    setModalMessage(message);
+    setIsModalOpen(true);
   };
 
   // Format waktu menjadi MM:SS
@@ -118,6 +99,13 @@ const Timer = () => {
           </label>
         </div>
       </div>
+
+      {/* Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        message={modalMessage}
+      />
     </div>
   );
 };
@@ -126,7 +114,7 @@ const Timer = () => {
 const styles = {
   container: { textAlign: "center", marginTop: "50px" },
   session: { fontSize: "24px", marginBottom: "10px" },
-  timer: { fontSize: "200px", marginBottom: "20px" },
+  timer: { fontSize: "48px", marginBottom: "20px" },
   controls: {
     display: "flex",
     justifyContent: "center",
