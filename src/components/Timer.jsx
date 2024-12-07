@@ -126,7 +126,7 @@ const Timer = () => {
 const styles = {
   container: { textAlign: "center", marginTop: "50px" },
   session: { fontSize: "24px", marginBottom: "10px" },
-  timer: { fontSize: "48px", marginBottom: "20px" },
+  timer: { fontSize: "200px", marginBottom: "20px" },
   controls: {
     display: "flex",
     justifyContent: "center",
